@@ -276,6 +276,34 @@ button {
   color: var(--muted);
   font-size: 11px;
 }
+.marker-editor {
+  border-top: 1px solid color-mix(in srgb, var(--muted) 20%, transparent);
+  padding-top: 18px;
+}
+.marker-editor textarea {
+  min-height: 70px;
+  resize: vertical;
+  width: 100%;
+  padding: 9px;
+  border: 1px solid color-mix(in srgb, var(--muted) 28%, transparent);
+  border-radius: 8px;
+  color: inherit;
+  background: var(--surface-2);
+}
+.marker-editor .secondary-button {
+  padding: 8px 10px;
+  margin-top: 12px;
+  font-size: 12px;
+}
+.delete-marker {
+  display: block;
+  margin-top: 12px;
+  border: 0;
+  color: #ff6b81;
+  background: transparent;
+  font-size: 12px;
+  padding: 0;
+}
 .theme-panel label {
   display: grid;
   gap: 7px;

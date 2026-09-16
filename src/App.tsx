@@ -8,7 +8,14 @@ const markerTypes = [
   ['door', 'Locked door', '#ffa502'],
   ['cache', 'Secret cache', '#a55eea'],
 ] as const
-type Marker = { id: number; type: string; x: number; y: number }
+type Marker = {
+  id: number
+  type: string
+  x: number
+  y: number
+  note: string
+  image?: string
+}
 
 const roadmap = [
   ['v0.1.0', 'Foundation', 'App shell, themes, and development setup'],
@@ -27,6 +34,8 @@ export function App() {
   const [markers, setMarkers] = useState<Marker[]>([])
   const [history, setHistory] = useState<Marker[][]>([])
   const [future, setFuture] = useState<Marker[][]>([])
+  const [selectedMarker, setSelectedMarker] = useState<number | null>(null)
+  const markerImageInput = useRef<HTMLInputElement>(null)
   const fileInput = useRef<HTMLInputElement>(null)
   const accent = themes.find((item) => item.id === theme)?.color ?? '#54a0ff'
   function loadMap(file?: File) {
@@ -48,6 +57,7 @@ export function App() {
       {
         id: Date.now(),
         type: activeType,
+        note: '',
         x: ((event.clientX - rect.left) / rect.width) * 100,
         y: ((event.clientY - rect.top) / rect.height) * 100,
       },
@@ -173,10 +183,31 @@ export function App() {
                     (item) => item[0] === marker.type,
                   )?.[2],
                 }}
-                title="Remove marker"
+                title="Select marker"
+                draggable
+                onDragEnd={(event) => {
+                  const rect =
+                    event.currentTarget.parentElement?.getBoundingClientRect()
+                  if (rect)
+                    updateMarkers(
+                      markers.map((item) =>
+                        item.id === marker.id
+                          ? {
+                              ...item,
+                              x:
+                                ((event.clientX - rect.left) / rect.width) *
+                                100,
+                              y:
+                                ((event.clientY - rect.top) / rect.height) *
+                                100,
+                            }
+                          : item,
+                      ),
+                    )
+                }}
                 onClick={(event) => {
                   event.stopPropagation()
-                  updateMarkers(markers.filter((item) => item.id !== marker.id))
+                  setSelectedMarker(marker.id)
                 }}
               >
                 ●
@@ -229,6 +260,71 @@ export function App() {
                 {markers.length} marker{markers.length === 1 ? '' : 's'}
               </span>
             </div>
+            {selectedMarker !== null &&
+              (() => {
+                const marker = markers.find(
+                  (item) => item.id === selectedMarker,
+                )
+                if (!marker) return null
+                return (
+                  <div className="marker-editor">
+                    <div className="panel-label">EDIT MARKER</div>
+                    <label>
+                      Note
+                      <textarea
+                        value={marker.note}
+                        onChange={(event) =>
+                          updateMarkers(
+                            markers.map((item) =>
+                              item.id === marker.id
+                                ? { ...item, note: event.target.value }
+                                : item,
+                            ),
+                          )
+                        }
+                        placeholder="What is here?"
+                      />
+                    </label>
+                    <button
+                      className="secondary-button"
+                      onClick={() => markerImageInput.current?.click()}
+                    >
+                      Attach image
+                    </button>
+                    <input
+                      ref={markerImageInput}
+                      className="visually-hidden"
+                      type="file"
+                      accept="image/*"
+                      onChange={(event) => {
+                        const file = event.target.files?.[0]
+                        if (!file) return
+                        const reader = new FileReader()
+                        reader.onload = () =>
+                          updateMarkers(
+                            markers.map((item) =>
+                              item.id === marker.id
+                                ? { ...item, image: String(reader.result) }
+                                : item,
+                            ),
+                          )
+                        reader.readAsDataURL(file)
+                      }}
+                    />
+                    <button
+                      className="delete-marker"
+                      onClick={() => {
+                        updateMarkers(
+                          markers.filter((item) => item.id !== marker.id),
+                        )
+                        setSelectedMarker(null)
+                      }}
+                    >
+                      Delete marker
+                    </button>
+                  </div>
+                )
+              })()}
             <div className="panel-label">MAP DETAILS</div>
             <label>
               Map title
