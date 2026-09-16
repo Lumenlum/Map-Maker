@@ -31,6 +31,7 @@ export function App() {
   const [game, setGame] = useState('')
   const [mapImage, setMapImage] = useState<string | null>(null)
   const [zoom, setZoom] = useState(1)
+  const [zoomOrigin, setZoomOrigin] = useState('50% 50%')
   const [activeType, setActiveType] = useState('box')
   const [markers, setMarkers] = useState<Marker[]>([])
   const [history, setHistory] = useState<Marker[][]>([])
@@ -80,6 +81,16 @@ export function App() {
     setHistory((items) => [...items, markers])
     setMarkers(next)
     setFuture((items) => items.slice(1))
+  }
+  function zoomAt(event: React.WheelEvent<HTMLDivElement>) {
+    event.preventDefault()
+    const rect = event.currentTarget.getBoundingClientRect()
+    setZoomOrigin(
+      `${((event.clientX - rect.left) / rect.width) * 100}% ${((event.clientY - rect.top) / rect.height) * 100}%`,
+    )
+    setZoom((value) =>
+      Math.min(3, Math.max(0.5, value + (event.deltaY < 0 ? 0.12 : -0.12))),
+    )
   }
   function saveMapCard() {
     setMapCards((cards) =>
@@ -222,72 +233,80 @@ export function App() {
           <div
             className="map-stage"
             onClick={addMarker}
+            onWheel={zoomAt}
             onDragOver={(event) => event.preventDefault()}
             onDrop={(event) => {
               event.preventDefault()
               loadMap(event.dataTransfer.files[0])
             }}
           >
-            {mapImage ? (
-              <img
-                className="map-image"
-                src={mapImage}
-                alt="Uploaded base map"
-                style={{ transform: `scale(${zoom})` }}
-              />
-            ) : (
-              <>
-                <div className="map-grid" />
-                <div className="map-placeholder">
-                  <span className="upload-icon">＋</span>
-                  <strong>Drop a map image here</strong>
-                  <small>
-                    or use Upload a map to create your first canvas.
-                  </small>
-                </div>
-              </>
-            )}
-            {markers.map((marker) => (
-              <button
-                key={marker.id}
-                className="marker-pin"
-                style={{
-                  left: `${marker.x}%`,
-                  top: `${marker.y}%`,
-                  background: markerTypes.find(
-                    (item) => item[0] === marker.type,
-                  )?.[2],
-                }}
-                title="Select marker"
-                draggable
-                onDragEnd={(event) => {
-                  const rect =
-                    event.currentTarget.parentElement?.getBoundingClientRect()
-                  if (rect)
-                    updateMarkers(
-                      markers.map((item) =>
-                        item.id === marker.id
-                          ? {
-                              ...item,
-                              x:
-                                ((event.clientX - rect.left) / rect.width) *
-                                100,
-                              y:
-                                ((event.clientY - rect.top) / rect.height) *
-                                100,
-                            }
-                          : item,
-                      ),
-                    )
-                }}
-                onClick={(event) => {
-                  event.stopPropagation()
-                  setSelectedMarker(marker.id)
-                }}
-              >
-                ●
-              </button>
-            ))}
+            <div
+              className="map-content"
+              style={{
+                transform: `scale(${zoom})`,
+                transformOrigin: zoomOrigin,
+              }}
+            >
+              {mapImage ? (
+                <img
+                  className="map-image"
+                  src={mapImage}
+                  alt="Uploaded base map"
+                />
+              ) : (
+                <>
+                  <div className="map-grid" />
+                  <div className="map-placeholder">
+                    <span className="upload-icon">＋</span>
+                    <strong>Drop a map image here</strong>
+                    <small>
+                      or use Upload a map to create your first canvas.
+                    </small>
+                  </div>
+                </>
+              )}
+              {markers.map((marker) => (
+                <button
+                  key={marker.id}
+                  className="marker-pin"
+                  style={{
+                    left: `${marker.x}%`,
+                    top: `${marker.y}%`,
+                    background: markerTypes.find(
+                      (item) => item[0] === marker.type,
+                    )?.[2],
+                  }}
+                  title="Select marker"
+                  draggable
+                  onDragEnd={(event) => {
+                    const rect =
+                      event.currentTarget.parentElement?.getBoundingClientRect()
+                    if (rect)
+                      updateMarkers(
+                        markers.map((item) =>
+                          item.id === marker.id
+                            ? {
+                                ...item,
+                                x:
+                                  ((event.clientX - rect.left) / rect.width) *
+                                  100,
+                                y:
+                                  ((event.clientY - rect.top) / rect.height) *
+                                  100,
+                              }
+                            : item,
+                        ),
+                      )
+                  }}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    setSelectedMarker(marker.id)
+                  }}
+                >
+                  ●
+                </button>
+              ))}
+            </div>
             {mapImage && (
               <div className="map-tools">
                 <button
