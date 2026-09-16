@@ -14,7 +14,7 @@ The implementation follows the versioned roadmap tracked in the GitHub [Map Make
 - [x] Create maps with optional title and game association.
 - [x] Upload and display a base map image, including drag-and-drop.
 - [x] Add zoom controls and reset behavior.
-- [ ] Add homepage map cards and map opening flow.
+- [x] Add homepage map cards and map opening flow.
 
 ## v0.3.0 — Markers and location details
 

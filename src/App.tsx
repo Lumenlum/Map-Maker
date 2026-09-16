@@ -16,6 +16,7 @@ type Marker = {
   note: string
   image?: string
 }
+type MapCard = { id: number; title: string; game: string; cover: string | null }
 
 const roadmap = [
   ['v0.1.0', 'Foundation', 'App shell, themes, and development setup'],
@@ -34,6 +35,9 @@ export function App() {
   const [markers, setMarkers] = useState<Marker[]>([])
   const [history, setHistory] = useState<Marker[][]>([])
   const [future, setFuture] = useState<Marker[][]>([])
+  const [mapCards, setMapCards] = useState<MapCard[]>([
+    { id: 1, title: 'My new map', game: 'Unassigned world', cover: null },
+  ])
   const [selectedMarker, setSelectedMarker] = useState<number | null>(null)
   const markerImageInput = useRef<HTMLInputElement>(null)
   const fileInput = useRef<HTMLInputElement>(null)
@@ -76,6 +80,28 @@ export function App() {
     setHistory((items) => [...items, markers])
     setMarkers(next)
     setFuture((items) => items.slice(1))
+  }
+  function saveMapCard() {
+    setMapCards((cards) =>
+      cards.map((card) =>
+        card.id === 1
+          ? {
+              ...card,
+              title: title || 'Untitled map',
+              game: game || 'Unassigned world',
+              cover: mapImage,
+            }
+          : card,
+      ),
+    )
+  }
+  function openMap(card: MapCard) {
+    setTitle(card.title)
+    setGame(card.game === 'Unassigned world' ? '' : card.game)
+    setMapImage(card.cover)
+    setMarkers([])
+    setSelectedMarker(null)
+    setZoom(1)
   }
   return (
     <main
@@ -132,6 +158,55 @@ export function App() {
           accept="image/*"
           onChange={(event) => loadMap(event.target.files?.[0])}
         />
+      </section>
+      <section className="map-library" aria-labelledby="library-title">
+        <div className="section-heading">
+          <div>
+            <div className="eyebrow">YOUR MAPS</div>
+            <h2 id="library-title">Open a workspace</h2>
+          </div>
+          <button
+            className="secondary-button"
+            onClick={() => {
+              setTitle('My new map')
+              setGame('')
+              setMapImage(null)
+              setMarkers([])
+            }}
+          >
+            New map
+          </button>
+        </div>
+        <div className="map-cards">
+          {mapCards.map((card) => (
+            <button
+              className="map-card"
+              key={card.id}
+              onClick={() => openMap(card)}
+            >
+              <div className="card-cover">
+                {card.cover ? <img src={card.cover} alt="" /> : <span>✦</span>}
+              </div>
+              <strong>{card.title}</strong>
+              <small>{card.game}</small>
+            </button>
+          ))}
+          <button
+            className="map-card add-card"
+            onClick={() => {
+              setTitle('My new map')
+              setGame('')
+              setMapImage(null)
+              setMarkers([])
+            }}
+          >
+            <span>＋</span>
+            <strong>Create a map</strong>
+          </button>
+        </div>
+        <button className="primary-button save-card" onClick={saveMapCard}>
+          Save current map to library
+        </button>
       </section>
       <section className="workspace-card" aria-labelledby="workspace-title">
         <div className="section-heading">
