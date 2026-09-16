@@ -4,7 +4,7 @@ Map Maker is a browser-based workspace for creating custom interactive game maps
 
 ## Current status
 
-The project is at `v0.3.0 — Markers and location details`. The app now supports categorized markers on the map canvas, marker removal, and Undo/Redo, alongside image upload, metadata, zoom, and themes.
+The project is at `v0.3.0 — Markers and location details`. The app supports categorized markers, movement and editing, notes and image attachments, Undo/Redo, image upload, metadata, zoom, and themes.
 
 ## Planned features
 

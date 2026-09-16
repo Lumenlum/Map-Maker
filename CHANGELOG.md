@@ -9,6 +9,8 @@ All notable changes to Map Maker are documented here.
 - Added the five initial marker categories.
 - Added click-to-place and click-to-remove markers.
 - Added Undo and Redo for marker changes.
+- Added marker selection, movement, notes, image attachments, and deletion controls.
+- Completed the initial map workspace editing flow.
 
 ### v0.2.0 — Map creation and viewer
 

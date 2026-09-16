@@ -18,9 +18,9 @@ The implementation follows the versioned roadmap tracked in the GitHub [Map Make
 
 ## v0.3.0 — Markers and location details
 
-- [x] Add, delete, and categorize markers on the map canvas.
+- [x] Add, move, edit, and delete markers on the map canvas.
 - [x] Add the initial marker categories.
-- [ ] Add marker notes and image attachments.
+- [x] Add marker notes and image attachments.
 - [x] Add Undo and Redo for marker changes.
 
 ## v0.4.0 — Overlays, layers, and filtering
