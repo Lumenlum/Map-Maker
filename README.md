@@ -4,7 +4,7 @@ Map Maker is a browser-based workspace for creating custom interactive game maps
 
 ## Current status
 
-The project is at `v0.1.0 — Project foundation`. This first slice establishes the React/Vite/TypeScript application shell, fixed rainbow accent themes with light and dark modes, a responsive workspace preview, and the initial development checks.
+The project is at `v0.2.0 — Map creation and viewer`. The app now provides a usable map workspace with image upload and drag-and-drop, map title/game metadata, zoom controls, and the fixed rainbow accent themes with light and dark modes.
 
 ## Planned features
 

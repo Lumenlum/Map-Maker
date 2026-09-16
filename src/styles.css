@@ -173,6 +173,70 @@ button {
   background: var(--surface);
   min-height: 300px;
 }
+.map-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 300px;
+  overflow: hidden;
+  background: var(--surface);
+}
+.map-image {
+  max-width: 100%;
+  max-height: 520px;
+  object-fit: contain;
+  transition: transform 0.2s;
+}
+.map-tools {
+  position: absolute;
+  bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  border: 1px solid color-mix(in srgb, var(--muted) 30%, transparent);
+}
+.map-tools button {
+  border: 0;
+  border-radius: 6px;
+  padding: 5px 9px;
+  color: inherit;
+  background: var(--surface-2);
+}
+.map-tools span {
+  min-width: 48px;
+  text-align: center;
+  font-size: 12px;
+}
+.theme-panel label {
+  display: grid;
+  gap: 7px;
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.theme-panel input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid color-mix(in srgb, var(--muted) 28%, transparent);
+  border-radius: 8px;
+  color: inherit;
+  background: var(--surface-2);
+}
+.theme-label {
+  margin-top: 25px;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
 .empty-map {
   position: relative;
   display: grid;

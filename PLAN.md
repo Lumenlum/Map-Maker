@@ -11,9 +11,9 @@ The implementation follows the versioned roadmap tracked in the GitHub [Map Make
 
 ## v0.2.0 — Map creation and viewer
 
-- [ ] Create maps with optional title, game association, and cover image.
-- [ ] Upload and display a base map image.
-- [ ] Add pan and zoom controls.
+- [x] Create maps with optional title and game association.
+- [x] Upload and display a base map image, including drag-and-drop.
+- [x] Add zoom controls and reset behavior.
 - [ ] Add homepage map cards and map opening flow.
 
 ## v0.3.0 — Markers and location details
