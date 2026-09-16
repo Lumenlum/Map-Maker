@@ -57,14 +57,21 @@ export function App() {
   function addMarker(event: React.MouseEvent<HTMLDivElement>) {
     if ((event.target as HTMLElement).closest('.map-tools, .marker-pin')) return
     const rect = event.currentTarget.getBoundingClientRect()
+    const visibleX = ((event.clientX - rect.left) / rect.width) * 100
+    const visibleY = ((event.clientY - rect.top) / rect.height) * 100
+    const [originX, originY] = zoomOrigin
+      .split(' ')
+      .map((value) => Number.parseFloat(value))
+    const x = originX + (visibleX - originX) / zoom
+    const y = originY + (visibleY - originY) / zoom
     updateMarkers([
       ...markers,
       {
         id: Date.now(),
         type: activeType,
         note: '',
-        x: ((event.clientX - rect.left) / rect.width) * 100,
-        y: ((event.clientY - rect.top) / rect.height) * 100,
+        x: Math.max(0, Math.min(100, x)),
+        y: Math.max(0, Math.min(100, y)),
       },
     ])
   }
@@ -91,6 +98,13 @@ export function App() {
     setZoom((value) =>
       Math.min(3, Math.max(0.5, value + (event.deltaY < 0 ? 0.12 : -0.12))),
     )
+  }
+  function doubleZoom(event: React.MouseEvent<HTMLDivElement>) {
+    const rect = event.currentTarget.getBoundingClientRect()
+    setZoomOrigin(
+      `${((event.clientX - rect.left) / rect.width) * 100}% ${((event.clientY - rect.top) / rect.height) * 100}%`,
+    )
+    setZoom((value) => Math.min(3, value + 0.35))
   }
   function saveMapCard() {
     setMapCards((cards) =>
@@ -234,6 +248,7 @@ export function App() {
             className="map-stage"
             onClick={addMarker}
             onWheel={zoomAt}
+            onDoubleClick={doubleZoom}
             onDragOver={(event) => event.preventDefault()}
             onDrop={(event) => {
               event.preventDefault()
@@ -320,7 +335,14 @@ export function App() {
                 >
                   ＋
                 </button>
-                <button onClick={() => setZoom(1)}>Reset</button>
+                <button
+                  onClick={() => {
+                    setZoom(1)
+                    setZoomOrigin('50% 50%')
+                  }}
+                >
+                  Reset
+                </button>
               </div>
             )}
           </div>
