@@ -17,6 +17,14 @@ type Marker = {
   image?: string
 }
 type MapCard = { id: number; title: string; game: string; cover: string | null }
+type Tile = {
+  id: string
+  src: string
+  left: number
+  top: number
+  width: number
+  height: number
+}
 
 const roadmap = [
   ['v0.1.0', 'Foundation', 'App shell, themes, and development setup'],
@@ -30,6 +38,7 @@ export function App() {
   const [title, setTitle] = useState('My new map')
   const [game, setGame] = useState('')
   const [mapImage, setMapImage] = useState<string | null>(null)
+  const [tiles, setTiles] = useState<Tile[]>([])
   const [zoom, setZoom] = useState(1)
   const [zoomOrigin, setZoomOrigin] = useState('50% 50%')
   const [activeType, setActiveType] = useState('box')
@@ -46,7 +55,44 @@ export function App() {
   function loadMap(file?: File) {
     if (!file?.type.startsWith('image/')) return
     const reader = new FileReader()
-    reader.onload = () => setMapImage(String(reader.result))
+    reader.onload = () => {
+      const source = String(reader.result)
+      setMapImage(source)
+      const image = new Image()
+      image.onload = () => {
+        const size = 512
+        const next: Tile[] = []
+        for (let top = 0; top < image.height; top += size)
+          for (let left = 0; left < image.width; left += size) {
+            const canvas = document.createElement('canvas')
+            canvas.width = Math.min(size, image.width - left)
+            canvas.height = Math.min(size, image.height - top)
+            canvas
+              .getContext('2d')
+              ?.drawImage(
+                image,
+                left,
+                top,
+                canvas.width,
+                canvas.height,
+                0,
+                0,
+                canvas.width,
+                canvas.height,
+              )
+            next.push({
+              id: `${left}-${top}`,
+              src: canvas.toDataURL('image/webp', 0.88),
+              left: (left / image.width) * 100,
+              top: (top / image.height) * 100,
+              width: (canvas.width / image.width) * 100,
+              height: (canvas.height / image.height) * 100,
+            })
+          }
+        setTiles(next)
+      }
+      image.src = source
+    }
     reader.readAsDataURL(file)
   }
   function updateMarkers(next: Marker[]) {
@@ -263,11 +309,22 @@ export function App() {
               }}
             >
               {mapImage ? (
-                <img
-                  className="map-image"
-                  src={mapImage}
-                  alt="Uploaded base map"
-                />
+                <div className="tile-layer" aria-label="Tiled base map">
+                  {tiles.map((tile) => (
+                    <img
+                      key={tile.id}
+                      className="map-tile"
+                      src={tile.src}
+                      alt=""
+                      style={{
+                        left: `${tile.left}%`,
+                        top: `${tile.top}%`,
+                        width: `${tile.width}%`,
+                        height: `${tile.height}%`,
+                      }}
+                    />
+                  ))}
+                </div>
               ) : (
                 <>
                   <div className="map-grid" />
