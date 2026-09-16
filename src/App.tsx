@@ -1,6 +1,15 @@
 import { useRef, useState } from 'react'
 import { themes, type ThemeId } from './theme'
 
+const markerTypes = [
+  ['box', 'Item box', '#54a0ff'],
+  ['spawn', 'Item spawn', '#2ed573'],
+  ['boss', 'Boss spawn', '#ff4757'],
+  ['door', 'Locked door', '#ffa502'],
+  ['cache', 'Secret cache', '#a55eea'],
+] as const
+type Marker = { id: number; type: string; x: number; y: number }
+
 const roadmap = [
   ['v0.1.0', 'Foundation', 'App shell, themes, and development setup'],
   ['v0.2.0', 'Map viewer', 'Upload maps, pan, zoom, and open projects'],
@@ -14,6 +23,10 @@ export function App() {
   const [game, setGame] = useState('')
   const [mapImage, setMapImage] = useState<string | null>(null)
   const [zoom, setZoom] = useState(1)
+  const [activeType, setActiveType] = useState('box')
+  const [markers, setMarkers] = useState<Marker[]>([])
+  const [history, setHistory] = useState<Marker[][]>([])
+  const [future, setFuture] = useState<Marker[][]>([])
   const fileInput = useRef<HTMLInputElement>(null)
   const accent = themes.find((item) => item.id === theme)?.color ?? '#54a0ff'
   function loadMap(file?: File) {
@@ -21,6 +34,38 @@ export function App() {
     const reader = new FileReader()
     reader.onload = () => setMapImage(String(reader.result))
     reader.readAsDataURL(file)
+  }
+  function updateMarkers(next: Marker[]) {
+    setHistory((items) => [...items.slice(-9), markers])
+    setMarkers(next)
+    setFuture([])
+  }
+  function addMarker(event: React.MouseEvent<HTMLDivElement>) {
+    if ((event.target as HTMLElement).closest('.map-tools, .marker-pin')) return
+    const rect = event.currentTarget.getBoundingClientRect()
+    updateMarkers([
+      ...markers,
+      {
+        id: Date.now(),
+        type: activeType,
+        x: ((event.clientX - rect.left) / rect.width) * 100,
+        y: ((event.clientY - rect.top) / rect.height) * 100,
+      },
+    ])
+  }
+  function undo() {
+    const previous = history.at(-1)
+    if (!previous) return
+    setFuture((items) => [markers, ...items])
+    setMarkers(previous)
+    setHistory((items) => items.slice(0, -1))
+  }
+  function redo() {
+    const next = future[0]
+    if (!next) return
+    setHistory((items) => [...items, markers])
+    setMarkers(next)
+    setFuture((items) => items.slice(1))
   }
   return (
     <main
@@ -91,6 +136,7 @@ export function App() {
         <div className="workspace-grid">
           <div
             className="map-stage"
+            onClick={addMarker}
             onDragOver={(event) => event.preventDefault()}
             onDrop={(event) => {
               event.preventDefault()
@@ -116,6 +162,26 @@ export function App() {
                 </div>
               </>
             )}
+            {markers.map((marker) => (
+              <button
+                key={marker.id}
+                className="marker-pin"
+                style={{
+                  left: `${marker.x}%`,
+                  top: `${marker.y}%`,
+                  background: markerTypes.find(
+                    (item) => item[0] === marker.type,
+                  )?.[2],
+                }}
+                title="Remove marker"
+                onClick={(event) => {
+                  event.stopPropagation()
+                  updateMarkers(markers.filter((item) => item.id !== marker.id))
+                }}
+              >
+                ●
+              </button>
+            ))}
             {mapImage && (
               <div className="map-tools">
                 <button
@@ -134,6 +200,35 @@ export function App() {
             )}
           </div>
           <aside className="theme-panel">
+            <div className="panel-label">MARKER TOOL</div>
+            <p className="tool-hint">
+              Choose a category, then click the map to place a marker.
+            </p>
+            <div className="marker-types">
+              {markerTypes.map(([id, name, color]) => (
+                <button
+                  key={id}
+                  className={
+                    activeType === id ? 'marker-type selected' : 'marker-type'
+                  }
+                  onClick={() => setActiveType(id)}
+                >
+                  <span style={{ background: color }} />
+                  {name}
+                </button>
+              ))}
+            </div>
+            <div className="history-tools">
+              <button onClick={undo} disabled={!history.length}>
+                Undo
+              </button>
+              <button onClick={redo} disabled={!future.length}>
+                Redo
+              </button>
+              <span>
+                {markers.length} marker{markers.length === 1 ? '' : 's'}
+              </span>
+            </div>
             <div className="panel-label">MAP DETAILS</div>
             <label>
               Map title

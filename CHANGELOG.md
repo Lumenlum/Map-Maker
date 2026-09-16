@@ -4,6 +4,12 @@ All notable changes to Map Maker are documented here.
 
 ## Unreleased
 
+### v0.3.0 — Markers and location details
+
+- Added the five initial marker categories.
+- Added click-to-place and click-to-remove markers.
+- Added Undo and Redo for marker changes.
+
 ### v0.2.0 — Map creation and viewer
 
 - Added a map workspace that accepts image uploads and drag-and-drop.

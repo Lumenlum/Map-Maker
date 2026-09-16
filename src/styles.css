@@ -210,6 +210,72 @@ button {
   text-align: center;
   font-size: 12px;
 }
+.marker-pin {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 27px;
+  height: 27px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  color: #08101c;
+  font-size: 13px;
+  box-shadow: 0 3px 12px #0008;
+  z-index: 2;
+}
+.tool-hint {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+.marker-types {
+  display: grid;
+  gap: 6px;
+  margin: 12px 0;
+}
+.marker-type {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  color: inherit;
+  background: transparent;
+  text-align: left;
+  font-size: 12px;
+}
+.marker-type.selected {
+  border-color: color-mix(in srgb, var(--accent) 65%, transparent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+.marker-type span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.history-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 16px 0 24px;
+}
+.history-tools button {
+  border: 1px solid color-mix(in srgb, var(--muted) 28%, transparent);
+  border-radius: 6px;
+  padding: 6px 8px;
+  color: inherit;
+  background: var(--surface-2);
+  font-size: 12px;
+}
+.history-tools button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.history-tools span {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 11px;
+}
 .theme-panel label {
   display: grid;
   gap: 7px;
